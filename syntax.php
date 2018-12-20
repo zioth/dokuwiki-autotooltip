@@ -68,8 +68,8 @@ class syntax_plugin_autotooltip extends DokuWiki_Syntax_Plugin {
 		preg_match('/<tip>(.+)<\/tip>/', $match, $tip);
 		preg_match('/<pageid>(.+)<\/pageid>/', $match, $pageid);
 
-		if (count($content) >= 1) {
-			$data = ['content' => $content[1]];
+		if (count($content) >= 1 || count($pageid) >= 1) {
+			$data = ['content' => count($content) >= 1 ? $content[1] : ''];
 
 			$classes = count($classes) >= 1 ? preg_split('/\s+/', $classes[1]) : [];
 			$classes = implode(' ', array_map(function($c) {return 'plugin-autotooltip__' . $c;}, $classes));

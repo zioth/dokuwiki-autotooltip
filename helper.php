@@ -61,7 +61,7 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 			// Ignore.
 		}
 
-		$link = $this->localRenderer->internallink($id, $content, null, true);
+		$link = $this->localRenderer->internallink($id, $content ?: $title, null, true);
 
 		if (page_exists($id)) {
 			// Remove the title attribute, since we have a better tooltip.
