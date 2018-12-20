@@ -78,9 +78,9 @@ class syntax_plugin_autotooltip extends DokuWiki_Syntax_Plugin {
 		}, $classes));
 		$data['classes'] = strlen($classes) ? $classes : 'plugin-autotooltip__default';
 
-		// <autott class1 class2>wikilink|Desc</autott>
 		if (strchr($inner, '<') === FALSE) {
 			$parts = array_map(function($s) {return trim($s);}, explode('|', $inner));
+			// <autott class1 class2>wikilink|desc</autott>
 			if (cleanID($parts[0]) == $parts[0]) {
 				$data['pageid'] = $parts[0];
 				if (count($parts) > 1) {
@@ -91,8 +91,8 @@ class syntax_plugin_autotooltip extends DokuWiki_Syntax_Plugin {
 		}
 		// <autott class1 class2><content></content><tip></tip><pageid></pageid></autott>
 		else {
-			preg_match('/<content>(.+)<\/content>/', $inner, $content);
-			preg_match('/<tip>(.+)<\/tip>/', $inner, $tip);
+			preg_match('/<content>([\s\S]+)<\/content>/', $inner, $content);
+			preg_match('/<tip>([\s\S]+)<\/tip>/', $inner, $tip);
 
 			if (count($content) >= 1 || count($pageid) >= 1) {
 				$data['content'] = count($content) >= 1 ? $content[1] : '';
