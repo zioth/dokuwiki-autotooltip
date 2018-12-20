@@ -47,8 +47,9 @@ class syntax_plugin_autotooltip extends DokuWiki_Syntax_Plugin {
 	 * @param $mode
 	 */
 	function connectTo($mode) {
-		$this->Lexer->addSpecialPattern('<tt2[^>]*>(?:[\s\S]*?</tt2>)', $mode, 'plugin_autotooltip');
+		$this->Lexer->addSpecialPattern('<autott[^>]*>(?:[\s\S]*?</autott>)', $mode, 'plugin_autotooltip');
 	}
+
 
 	/**
 	 * @param string $match - The match from addEntryPattern.
@@ -58,27 +59,42 @@ class syntax_plugin_autotooltip extends DokuWiki_Syntax_Plugin {
 	 * @return array|string
 	 */
 	function handle($match, $state, $pos, Doku_Handler $handler) {
-		// <tt2 class1 class2><content></content><tip></tip><pageid></pageid></tt2>
+		$inner = [];
 		$classes = [];
 		$content = [];
 		$tip = [];
 		$pageid = [];
-		preg_match('/<tt2\s*([^>]+?)\s*>/', $match, $classes);
-		preg_match('/<content>(.+)<\/content>/', $match, $content);
-		preg_match('/<tip>(.+)<\/tip>/', $match, $tip);
-		preg_match('/<pageid>(.+)<\/pageid>/', $match, $pageid);
+		preg_match('/<autott\s*([^>]+?)\s*>/', $match, $classes);
+		preg_match('/<autott[^>]*>\s*([\s\S]+)\s*<\/autott>/', $match, $inner);
+		if (count($inner) < 1) {
+			return 'ERROR';
+		}
+		$inner = $inner[1];
 
-		if (count($content) >= 1 || count($pageid) >= 1) {
-			$data = ['content' => count($content) >= 1 ? $content[1] : ''];
+		// <autott class1 class2>wikilink</autott>
+		if (cleanID($inner) == $inner) {
+			return ['pageid' => $inner];
+		}
+		// <autott class1 class2><content></content><tip></tip><pageid></pageid></autott>
+		else {
+			preg_match('/<content>(.+)<\/content>/', $inner, $content);
+			preg_match('/<tip>(.+)<\/tip>/', $inner, $tip);
+			preg_match('/<pageid>(.+)<\/pageid>/', $inner, $pageid);
 
-			$classes = count($classes) >= 1 ? preg_split('/\s+/', $classes[1]) : [];
-			$classes = implode(' ', array_map(function($c) {return 'plugin-autotooltip__' . $c;}, $classes));
-			$data['classes'] = strlen($classes) ? $classes : 'plugin-autotooltip__default';
+			if (count($content) >= 1 || count($pageid) >= 1) {
+				$data = ['content' => count($content) >= 1 ? $content[1] : ''];
 
-			$data['pageid'] = count($pageid) >= 1 ? $pageid[1] : null;
-			$data['tip'] = count($tip) >= 1 ? $tip[1] : null;
+				$classes = count($classes) >= 1 ? preg_split('/\s+/', $classes[1]) : [];
+				$classes = implode(' ', array_map(function ($c) {
+					return 'plugin-autotooltip__' . $c;
+				}, $classes));
+				$data['classes'] = strlen($classes) ? $classes : 'plugin-autotooltip__default';
 
-			return $data;
+				$data['pageid'] = count($pageid) >= 1 ? $pageid[1] : null;
+				$data['tip'] = count($tip) >= 1 ? $tip[1] : null;
+
+				return $data;
+			}
 		}
 
 		return 'ERROR';

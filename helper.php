@@ -18,8 +18,8 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 	/**
 	 * Return a simple tooltip.
 	 *
-	 * @param string $content - The on-page content. May contain HTML.
-	 * @param string $tooltip - Tooltip content. May contain HTML.
+	 * @param string $content - The on-page content. May contain newlines.
+	 * @param string $tooltip - Tooltip content. May contain newlines.
 	 * @param string $classes - CSS classes to add to this tooltip.
 	 * @return string
 	 */
@@ -30,11 +30,11 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 
 		$textclass = strstr($content, '<a ') !== FALSE ? '' : 'plugin-autotooltip__simple';
 
-		return '<div class="plugin-autotooltip_linked ' . $textclass . '" onmouseover="autotooltip.show(this)" onmouseout="autotooltip.hide()">' .
+		return '<span class="plugin-autotooltip_linked ' . $textclass . '" onmouseover="autotooltip.show(this)" onmouseout="autotooltip.hide()">' .
 			$content .
-			'<div class="plugin-autotooltip-hidden-classes">' . $classes . '</div>' .
-			'<div class="plugin-autotooltip-hidden-tip">' . $this->_formatTT($tooltip) . '</div>' .
-		'</div>';
+			'<span class="plugin-autotooltip-hidden-classes">' . $classes . '</span>' .
+			'<span class="plugin-autotooltip-hidden-tip">' . $this->_formatTT($tooltip) . '</span>' .
+		'</span>';
 	}
 
 
@@ -42,7 +42,7 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 	 * Render a tooltip, with the title and abstract of a page.
 	 *
 	 * @param string $id - A page id.
-	 * @param string $content - The on-page content. May contain HTML.
+	 * @param string $content - The on-page content. May contain newlines.
 	 * @param string $classes - CSS classes to add to this tooltip.
 	 * @return string
 	 */
@@ -67,16 +67,14 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 			// Remove the title attribute, since we have a better tooltip.
 			$link = preg_replace('/title="[^"]*"/', '', $link);
 
-			return '<div class="plugin-autotooltip_linked" onmouseover="autotooltip.show(this)" onmouseout="autotooltip.hide()">' .
+			return '<span class="plugin-autotooltip_linked" onmouseover="autotooltip.show(this)" onmouseout="autotooltip.hide()">' .
 				$link .
-				'<div class="plugin-autotooltip-hidden-classes">plugin-autotooltip_big ' . $classes . '</div>' .
-				'<div class="plugin-autotooltip-hidden-tip">' .
-				'  <h3>' . $title . '</h3>' .
-				'  <div class="level3">' .
-				'    <p class="plugin-autotooltip_abstract">' . $this->_formatTT($abstract) . '</p>' .
-				'  </div>' .
-				'</div>' .
-				'</div>';
+				'<span class="plugin-autotooltip-hidden-classes">plugin-autotooltip_big ' . $classes . '</span>' .
+				'<span class="plugin-autotooltip-hidden-tip">' .
+				'  <span class="plugin-autotooltip-title">' . $title . '</span>' .
+				($abstract ? '  <br><br><span class="plugin-autotooltip_abstract">' . $this->_formatTT($abstract) . '</span>' : '') .
+				'</span>' .
+				'</span>';
 		}
 		else {
 			return $link;
