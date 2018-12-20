@@ -89,6 +89,7 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 	 * @return string
 	 */
 	private function _formatTT($tt) {
-		return preg_replace('/\r?\n/', '<br>', $tt);
+		$tt = preg_replace('/\r?\n/', '<br>', $tt);
+		return preg_replace('/(<br>){3,}/', '<br><br>', $tt);
 	}
 }
