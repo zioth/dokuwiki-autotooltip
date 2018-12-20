@@ -71,26 +71,32 @@ class syntax_plugin_autotooltip extends DokuWiki_Syntax_Plugin {
 		}
 		$inner = $inner[1];
 
-		// <autott class1 class2>wikilink</autott>
-		if (cleanID($inner) == $inner) {
-			return ['pageid' => $inner];
+		$data = [];
+		$classes = count($classes) >= 1 ? preg_split('/\s+/', $classes[1]) : [];
+		$classes = implode(' ', array_map(function ($c) {
+			return 'plugin-autotooltip__' . $c;
+		}, $classes));
+		$data['classes'] = strlen($classes) ? $classes : 'plugin-autotooltip__default';
+
+		// <autott class1 class2>wikilink|Desc</autott>
+		if (strchr($inner, '<') === FALSE) {
+			$parts = array_map(function($s) {return trim($s);}, explode('|', $inner));
+			if (cleanID($parts[0]) == $parts[0]) {
+				$data['pageid'] = $parts[0];
+				if (count($parts) > 1) {
+					$data['content'] = $parts[1];
+				}
+				return $data;
+			}
 		}
 		// <autott class1 class2><content></content><tip></tip><pageid></pageid></autott>
 		else {
 			preg_match('/<content>(.+)<\/content>/', $inner, $content);
 			preg_match('/<tip>(.+)<\/tip>/', $inner, $tip);
-			preg_match('/<pageid>(.+)<\/pageid>/', $inner, $pageid);
 
 			if (count($content) >= 1 || count($pageid) >= 1) {
-				$data = ['content' => count($content) >= 1 ? $content[1] : ''];
+				$data['content'] = count($content) >= 1 ? $content[1] : '';
 
-				$classes = count($classes) >= 1 ? preg_split('/\s+/', $classes[1]) : [];
-				$classes = implode(' ', array_map(function ($c) {
-					return 'plugin-autotooltip__' . $c;
-				}, $classes));
-				$data['classes'] = strlen($classes) ? $classes : 'plugin-autotooltip__default';
-
-				$data['pageid'] = count($pageid) >= 1 ? $pageid[1] : null;
 				$data['tip'] = count($tip) >= 1 ? $tip[1] : null;
 
 				return $data;
