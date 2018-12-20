@@ -21,16 +21,23 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 	 * @param string $content - The on-page content. May contain newlines.
 	 * @param string $tooltip - Tooltip content. May contain newlines.
 	 * @param string $classes - CSS classes to add to this tooltip.
+	 * @param string $textStyle - CSS styles for the linked content
 	 * @return string
 	 */
-	function forText($content, $tooltip, $classes = '') {
+	function forText($content, $tooltip, $classes = '', $textStyle = '') {
 		if (!$classes) {
 			$classes = 'plugin-autotooltip__default';
 		}
 
-		$textclass = strstr($content, '<a ') !== FALSE ? '' : 'plugin-autotooltip__simple';
+		$textClass = '';
+		if (empty($textStyle)) {
+			$textClass = 'plugin-autotooltip_linked';
+			if (strstr($content, '<a ') === FALSE) {
+				$textClass .= ' plugin-autotooltip__simple';
+			}
+		}
 
-		return '<span class="plugin-autotooltip_linked ' . $textclass . '" onmouseover="autotooltip.show(this)" onmouseout="autotooltip.hide()">' .
+		return '<span class="' . $textClass . '" style="' . $textStyle . '" onmouseover="autotooltip.show(this)" onmouseout="autotooltip.hide()">' .
 			$content .
 			'<span class="plugin-autotooltip-hidden-classes">' . $classes . '</span>' .
 			'<span class="plugin-autotooltip-hidden-tip">' . $this->_formatTT($tooltip) . '</span>' .
@@ -44,9 +51,10 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 	 * @param string $id - A page id.
 	 * @param string $content - The on-page content. May contain newlines.
 	 * @param string $classes - CSS classes to add to this tooltip.
+	 * @param string $linkStyle - Style attribute for the link.
 	 * @return string
 	 */
-	function forWikilink($id, $content, $classes = '') {
+	function forWikilink($id, $content, $classes = '', $linkStyle = '') {
 		if (!$classes) {
 			$classes = 'plugin-autotooltip__default';
 		}
@@ -62,6 +70,10 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 		}
 
 		$link = $this->localRenderer->internallink($id, $content ?: $title, null, true);
+
+		if (!empty($linkStyle)) {
+			$link = preg_replace('/<a /', '<a style="' . $linkStyle . '" ', $link);
+		}
 
 		if (page_exists($id)) {
 			// Remove the title attribute, since we have a better tooltip.
