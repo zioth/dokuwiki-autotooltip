@@ -61,13 +61,10 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 
 		$title = p_get_metadata($id, 'title');
 		$abstract = p_get_metadata($id, 'description abstract');
-		try {
-			// By default, the abstract starts with the title. Remove it so it's not displayed twice, but still fetch
-			// both pieces of metadata, in case another plugin rewrote the abstract.
-			$abstract = preg_replace('/^' . preg_quote($title) . '(\r?\n)+/', '', $abstract);
-		} catch(\Exception $e) {
-			// Ignore.
-		}
+
+		// By default, the abstract starts with the title. Remove it so it's not displayed twice, but still fetch
+		// both pieces of metadata, in case another plugin rewrote the abstract.
+		$abstract = preg_replace('/^' . $this->_pregEscape($title) . '(\r?\n)+/', '', $abstract);
 
 		$link = $this->localRenderer->internallink($id, $content ?: $title, null, true);
 
@@ -103,5 +100,16 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 	private function _formatTT($tt) {
 		$tt = preg_replace('/\r?\n/', '<br>', $tt);
 		return preg_replace('/(<br>){3,}/', '<br><br>', $tt);
+	}
+
+
+	/**
+	 * Escape a string for inclusion in a regular expression, assuming forward slash is used as the delimiter.
+	 *
+	 * @param string $r - The regex string, without delimiters.
+	 * @return string
+	 */
+	private function _pregEscape($r) {
+		return preg_replace('/\//', '\\/', preg_quote($r));
 	}
 }
