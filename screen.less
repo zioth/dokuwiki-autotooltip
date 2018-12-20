@@ -1,0 +1,52 @@
+.plugin-autotooltip_tip
+{
+	position: absolute;
+	display: block;
+	opacity: 0;
+	transition: opacity .3s ease-in-out;
+	padding: 2px 12px 3px 7px;
+	margin-left: 5px;
+	z-index: 99999;
+	pointer-events: none;
+	border-radius: 3px;
+	color: #FFF;
+	background: rgba(20, 20, 20, 0.85);
+}
+
+.plugin-autotooltip_big {
+	padding: 12px;
+	border-radius: 6px;
+
+	> *:first-child {
+		margin-top: 0;
+		padding-top: 0;
+	}
+
+	> .level3 > *:last-child {
+		margin-bottom: 0;
+		padding-bottom: 0;
+	}
+}
+
+.plugin-autotooltip--visible {
+	opacity: 1;
+}
+
+.plugin-autotooltip-hidden-tip, .plugin-autotooltip-hidden-classes {
+	display: none;
+}
+
+.plugin-autotooltip_linked {
+	display: inline;
+}
+
+.plugin-autotooltip__simple {
+	border-bottom: 1px dotted black;
+}
+
+
+// Test alternate style
+.plugin-autotooltip__blue {
+	color: #FFF;
+	background: rgba(0, 0, 40, 0.85);
+}
