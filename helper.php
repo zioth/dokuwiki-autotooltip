@@ -54,7 +54,7 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 	 * @param string $linkStyle - Style attribute for the link.
 	 * @return string
 	 */
-	function forWikilink($id, $content, $classes = '', $linkStyle = '') {
+	function forWikilink($id, $content = null, $classes = '', $linkStyle = '') {
 		if (!$classes) {
 			$classes = 'plugin-autotooltip__default';
 		}
