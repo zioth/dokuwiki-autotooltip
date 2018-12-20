@@ -20,7 +20,7 @@ var autotooltip = function($) {
 	var _init = function() {
 		if (!tt) {
 			tt = $('<div class="plugin-autotooltip_tip"></div>');
-			$(document.body).append(tt);
+			$('.dokuwiki .bodyContent').append(tt);
 		}
 
 		$(document).on('mousemove', _move);
@@ -40,7 +40,7 @@ var autotooltip = function($) {
 			requestAnimationFrame(function() {
 				if (localMoveCount == moveCount) {
 					//TODO: Limit right/left pos too
-					var top = Math.max(e.pageY - tt.outerHeight() - 4, window.scrollY + 8);
+					var top = Math.max(e.pageY - window.scrollY - tt.outerHeight() - 4, 8);
 					tt.css({top: top + 'px', left: (e.pageX + 4) + 'px'});
 				}
 			});
