@@ -20,11 +20,13 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 	 *
 	 * @param string $content - The on-page content. May contain newlines.
 	 * @param string $tooltip - Tooltip content. May contain newlines.
+	 * @param string $title - Tooltip title.
+	 * @param string $preTitle - Text to display before the title.
 	 * @param string $classes - CSS classes to add to this tooltip.
 	 * @param string $textStyle - CSS styles for the linked content
 	 * @return string
 	 */
-	function forText($content, $tooltip, $classes = '', $textStyle = '') {
+	function forText($content, $tooltip, $title='', $preTitle = '', $classes = '', $textStyle = '') {
 		if (!$classes) {
 			$classes = 'plugin-autotooltip__default';
 		}
@@ -37,10 +39,23 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 			}
 		}
 
+		$contentParts = [];
+		if (!empty($preTitle)) {
+			$contentParts[] = '<span>' . $this->_formatTT($preTitle) . '</span>';
+		}
+		if (!empty($title)) {
+			$contentParts[] = '<span class="plugin-autotooltip-title">' . $title . '</span>';
+		}
+		if (!empty($tooltip)) {
+			$contentParts[] = '<span>' . $this->_formatTT($tooltip) . '</span>';
+		}
+
 		return '<span class="' . $textClass . '" style="' . $textStyle . '" onmouseover="autotooltip.show(this)" onmouseout="autotooltip.hide()">' .
 			$content .
 			'<span class="plugin-autotooltip-hidden-classes">' . $classes . '</span>' .
-			'<span class="plugin-autotooltip-hidden-tip">' . $this->_formatTT($tooltip) . '</span>' .
+			'<span class="plugin-autotooltip-hidden-tip">' .
+			implode('<br><br>', $contentParts) .
+			'</span>' .
 		'</span>';
 	}
 
@@ -50,11 +65,12 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 	 *
 	 * @param string $id - A page id.
 	 * @param string $content - The on-page content. May contain newlines.
+	 * @param string $preTitle - Text to display before the title.
 	 * @param string $classes - CSS classes to add to this tooltip.
 	 * @param string $linkStyle - Style attribute for the link.
 	 * @return string
 	 */
-	function forWikilink($id, $content = null, $classes = '', $linkStyle = '') {
+	function forWikilink($id, $content = null, $preTitle = '', $classes = '', $linkStyle = '') {
 		if (!$classes) {
 			$classes = 'plugin-autotooltip__default';
 		}
@@ -75,15 +91,7 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 		if (page_exists($id)) {
 			// Remove the title attribute, since we have a better tooltip.
 			$link = preg_replace('/title="[^"]*"/', '', $link);
-
-			return '<span class="plugin-autotooltip_linked" onmouseover="autotooltip.show(this)" onmouseout="autotooltip.hide()">' .
-				$link .
-				'<span class="plugin-autotooltip-hidden-classes">plugin-autotooltip_big ' . $classes . '</span>' .
-				'<span class="plugin-autotooltip-hidden-tip">' .
-				'  <span class="plugin-autotooltip-title">' . $title . '</span>' .
-				($abstract ? '  <br><br><span class="plugin-autotooltip_abstract">' . $this->_formatTT($abstract) . '</span>' : '') .
-				'</span>' .
-				'</span>';
+			return $this->forText($link, $abstract, $title, $preTitle, "plugin-autotooltip_big $classes");
 		}
 		else {
 			return $link;

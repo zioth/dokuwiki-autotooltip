@@ -61,8 +61,6 @@ class syntax_plugin_autotooltip extends DokuWiki_Syntax_Plugin {
 	function handle($match, $state, $pos, Doku_Handler $handler) {
 		$inner = [];
 		$classes = [];
-		$content = [];
-		$tip = [];
 		$pageid = [];
 		preg_match('/<autott\s*([^>]+?)\s*>/', $match, $classes);
 		preg_match('/<autott[^>]*>\s*([\s\S]+)\s*<\/autott>/', $match, $inner);
@@ -89,15 +87,19 @@ class syntax_plugin_autotooltip extends DokuWiki_Syntax_Plugin {
 				return $data;
 			}
 		}
-		// <autott class1 class2><content></content><tip></tip><pageid></pageid></autott>
+		// <autott class1 class2><content></content><tip></tip><title></title><pageid></pageid></autott>
 		else {
+			$content = [];
+			$tip = [];
+			$title = [];
 			preg_match('/<content>([\s\S]+)<\/content>/', $inner, $content);
 			preg_match('/<tip>([\s\S]+)<\/tip>/', $inner, $tip);
+			preg_match('/<title>([\s\S]+)<\/title>/', $inner, $title);
 
 			if (count($content) >= 1 || count($pageid) >= 1) {
 				$data['content'] = count($content) >= 1 ? $content[1] : '';
-
 				$data['tip'] = count($tip) >= 1 ? $tip[1] : null;
+				$data['title'] = count($title) >= 1 ? $title[1] : null;
 
 				return $data;
 			}
@@ -119,10 +121,10 @@ class syntax_plugin_autotooltip extends DokuWiki_Syntax_Plugin {
 				msg('Error: Invalid instantiation of autotooltip plugin');
 			}
 			else if ($data['pageid']) {
-				$renderer->doc .= $this->m_helper->forWikilink($data['pageid'], $data['content'], $data['classes']);
+				$renderer->doc .= $this->m_helper->forWikilink($data['pageid'], $data['content'], '', $data['classes']);
 			}
 			else {
-				$renderer->doc .= $this->m_helper->forText($data['content'], $data['tip'], $data['classes']);
+				$renderer->doc .= $this->m_helper->forText($data['content'], $data['tip'], $data['title'], '', $data['classes']);
 			}
 		}
 		else {
