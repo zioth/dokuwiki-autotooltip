@@ -19,9 +19,9 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 	 * Return a simple tooltip.
 	 *
 	 * @param string $content - The on-page content. May contain newlines.
-	 * @param string $tooltip - Tooltip content. May contain newlines.
-	 * @param string $title - Tooltip title.
-	 * @param string $preTitle - Text to display before the title.
+	 * @param string $tooltip - The tooltip content. Newlines will be rendered as line breaks.
+	 * @param string $title - The title inside the tooltip.
+	 * @param string $preTitle - Text to display before the title. Newlines will be rendered as line breaks.
 	 * @param string $classes - CSS classes to add to this tooltip.
 	 * @param string $textStyle - CSS styles for the linked content
 	 * @return string
@@ -41,13 +41,13 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 
 		$contentParts = [];
 		if (!empty($preTitle)) {
-			$contentParts[] = '<span>' . $this->_formatTT($preTitle) . '</span>';
+			$contentParts[] = $this->_formatTT($preTitle);
 		}
 		if (!empty($title)) {
 			$contentParts[] = '<span class="plugin-autotooltip-title">' . $title . '</span>';
 		}
 		if (!empty($tooltip)) {
-			$contentParts[] = '<span>' . $this->_formatTT($tooltip) . '</span>';
+			$contentParts[] = $this->_formatTT($tooltip);
 		}
 
 		return '<span class="' . $textClass . '" style="' . $textStyle . '" onmouseover="autotooltip.show(this)" onmouseout="autotooltip.hide()">' .
@@ -64,8 +64,8 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 	 * Render a tooltip, with the title and abstract of a page.
 	 *
 	 * @param string $id - A page id.
-	 * @param string $content - The on-page content. May contain newlines.
-	 * @param string $preTitle - Text to display before the title.
+	 * @param string $content - The on-page content. Newlines will be rendered as line breaks. Omit to use the page's title.
+	 * @param string $preTitle - Text to display before the title in the tooltip. Newlines will be rendered as line breaks.
 	 * @param string $classes - CSS classes to add to this tooltip.
 	 * @param string $linkStyle - Style attribute for the link.
 	 * @return string
@@ -106,8 +106,10 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 	 * @return string
 	 */
 	private function _formatTT($tt) {
-		$tt = preg_replace('/\r?\n/', '<br>', $tt);
-		return preg_replace('/(<br>){3,}/', '<br><br>', $tt);
+		// Convert double-newlines into vertical space.
+		$tt = preg_replace('/(\r?\n){2,}/', '<br><br>', $tt);
+		// Single newlines get collapsed, just like in HTML.
+		return preg_replace('/(\r?\n)/', ' ', $tt);
 	}
 
 
