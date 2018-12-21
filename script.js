@@ -20,7 +20,7 @@ var autotooltip = function($) {
 	var _init = function() {
 		if (!tt) {
 			tt = $('<div class="plugin-autotooltip_tip"></div>');
-			$('.dokuwiki .bodyContent').append(tt);
+			$('.dokuwiki .bodyContent, .dokuwiki .wiki-content').first().append(tt);
 		}
 
 		$(document).on('mousemove', _move);
