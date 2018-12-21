@@ -39,9 +39,9 @@ var autotooltip = function($) {
 			var localMoveCount = ++moveCount;
 			requestAnimationFrame(function() {
 				if (localMoveCount == moveCount) {
-					//TODO: Limit right/left pos too
 					var top = Math.max(e.pageY - window.scrollY - tt.outerHeight() - 4, 8);
-					tt.css({top: top + 'px', left: (e.pageX + 4) + 'px'});
+					var left = Math.max(e.pageX + 4, 8);
+					tt.css({top: top + 'px', left: left + 'px'});
 				}
 			});
 		}
