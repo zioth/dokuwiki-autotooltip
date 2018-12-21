@@ -1,0 +1,2 @@
+<?php
+$conf['style'] = 'default';

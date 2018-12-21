@@ -28,7 +28,20 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 	 */
 	function forText($content, $tooltip, $title='', $preTitle = '', $classes = '', $textStyle = '') {
 		if (!$classes) {
-			$classes = 'plugin-autotooltip__default';
+			$classes = $this->getConf('style');
+		}
+		if (!$classes) {
+			$classes = 'default';
+		}
+
+		// Sanitize
+		$classes = htmlspecialchars($classes);
+		// Add the plugin prefix to all classes.
+		$classes = preg_replace('/(\w+)/', 'plugin-autotooltip__$1', $classes);
+
+		$partCount = (empty($title) ? 0 : 1) + (empty($preTitle) ? 0 : 1) + (empty($tooltip) ? 0 : 1);
+		if ($partCount > 1 || strchr($tooltip, "\n") !== FALSE || strlen($tooltip) > 40) {
+			$classes .= ' plugin-autotooltip_big';
 		}
 
 		$textClass = '';
@@ -71,10 +84,6 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 	 * @return string
 	 */
 	function forWikilink($id, $content = null, $preTitle = '', $classes = '', $linkStyle = '') {
-		if (!$classes) {
-			$classes = 'plugin-autotooltip__default';
-		}
-
 		$title = p_get_metadata($id, 'title');
 		$abstract = p_get_metadata($id, 'description abstract');
 
@@ -91,7 +100,7 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 		if (page_exists($id)) {
 			// Remove the title attribute, since we have a better tooltip.
 			$link = preg_replace('/title="[^"]*"/', '', $link);
-			return $this->forText($link, $abstract, $title, $preTitle, "plugin-autotooltip_big $classes");
+			return $this->forText($link, $abstract, $title, $preTitle, $classes);
 		}
 		else {
 			return $link;
