@@ -20,7 +20,17 @@ var autotooltip = function($) {
 	var _init = function() {
 		if (!tt) {
 			tt = $('<div class="plugin-autotooltip_tip"></div>');
-			$('.dokuwiki .bodyContent, .dokuwiki .wiki-content').first().append(tt);
+			// Cover the various templates.
+			var container = $('.dokuwiki .bodyContent, .dokuwiki .wiki-content, #dokuwiki__content');
+			// Use the root .dokuwiki if we have to, though we might lose some font information.
+			if (!container.length) {
+				container = $('.dokuwiki');
+			}
+			// In case the template is really strange.
+			if (!container.length) {
+				container = $('body');
+			}
+			container.first().append(tt);
 		}
 
 		$(document).on('mousemove', _move);
