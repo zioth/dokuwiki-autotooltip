@@ -16,6 +16,42 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 
 
 	/**
+	 * Return methods of this helper
+	 *
+	 * @return array with methods description
+	 */
+	function getMethods() {
+		$result = array();
+		$result[] = array(
+			'name' => 'forText',
+			'desc' => 'Manually construct a tooltip',
+			'params' => array(
+				'content' => 'string',
+				'tooltip' => 'string',
+				'title (optional)' => 'string',
+				'preTitle (optional)' => 'string',
+				'classes (optional)' => 'string',
+				'textStyles (optional)' => 'string',
+			),
+			'return' => array('result' => 'string')
+		);
+		$result[] = array(
+			'name' => 'forWikilink',
+			'desc' => 'Generate a tooltip from a wikilink',
+			'params' => array(
+				'id' => 'string',
+				'content (optional)' => 'string',
+				'preTitle (optional)' => 'string',
+				'classes (optional)' => 'string',
+				'textStyles (optional)' => 'string',
+			),
+			'return' => array('result' => 'string')
+		);
+		return $result;
+	}
+
+
+	/**
 	 * Return a simple tooltip.
 	 *
 	 * @param string $content - The on-page content. May contain newlines.
