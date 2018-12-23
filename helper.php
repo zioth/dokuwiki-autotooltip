@@ -27,10 +27,10 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 	 * @return string
 	 */
 	function forText($content, $tooltip, $title='', $preTitle = '', $classes = '', $textStyle = '') {
-		if (!$classes) {
+		if (empty($classes)) {
 			$classes = $this->getConf('style');
 		}
-		if (!$classes) {
+		if (empty($classes)) {
 			$classes = 'default';
 		}
 
@@ -48,7 +48,7 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 		if (empty($textStyle)) {
 			$textClass = 'plugin-autotooltip_linked';
 			if (strstr($content, '<a ') === FALSE) {
-				$textClass .= ' plugin-autotooltip__simple';
+				$textClass .= ' plugin-autotooltip_simple';
 			}
 		}
 

@@ -70,11 +70,7 @@ class syntax_plugin_autotooltip extends DokuWiki_Syntax_Plugin {
 		$inner = $inner[1];
 
 		$data = [];
-		$classes = count($classes) >= 1 ? preg_split('/\s+/', $classes[1]) : [];
-		$classes = implode(' ', array_map(function ($c) {
-			return 'plugin-autotooltip__' . $c;
-		}, $classes));
-		$data['classes'] = strlen($classes) ? $classes : 'plugin-autotooltip__default';
+		$data['classes'] = count($classes) >= 1 ? $classes[1] : '';
 
 		if (strchr($inner, '<') === FALSE) {
 			$parts = array_map(function($s) {return trim($s);}, explode('|', $inner));
