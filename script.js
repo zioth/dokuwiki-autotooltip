@@ -18,7 +18,7 @@ var autotooltip = function($) {
 	 */
 	var _init = function() {
 		if (!tt) {
-			tt = $('<div class="plugin-autotooltip_tip"></div>');
+			tt = $('<div class="plugin-autotooltip_tip" role="tooltip"></div>');
 			// Cover the various templates.
 			var container = $('.dokuwiki .bodyContent, .dokuwiki .wiki-content, #dokuwiki__content');
 			// Use the root .dokuwiki if we have to, though we might lose some font information.
