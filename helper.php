@@ -69,6 +69,7 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 		if (empty($classes)) {
 			$classes = 'default';
 		}
+		$delay = $this->getConf('delay') ?: 0;
 
 		// Sanitize
 		$classes = htmlspecialchars($classes);
@@ -99,7 +100,7 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 			$contentParts[] = $this->_formatTT($tooltip);
 		}
 
-		return '<span class="' . $textClass . '" style="' . $textStyle . '" onmouseover="autotooltip.show(this)" onmouseout="autotooltip.hide()">' .
+		return '<span class="' . $textClass . '" style="' . $textStyle . '" onmouseover="autotooltip.show(this)" onmouseout="autotooltip.hide()" data-delay="' . $delay . '">' .
 			$content .
 			'<span class="plugin-autotooltip-hidden-classes">' . $classes . '</span>' .
 			'<span class="plugin-autotooltip-hidden-tip">' .
@@ -121,11 +122,6 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 	 */
 	function forWikilink($id, $content = null, $preTitle = '', $classes = '', $linkStyle = '') {
 		$title = p_get_metadata($id, 'title');
-		$abstract = p_get_metadata($id, 'description abstract');
-
-		// By default, the abstract starts with the title. Remove it so it's not displayed twice, but still fetch
-		// both pieces of metadata, in case another plugin rewrote the abstract.
-		$abstract = preg_replace('/^' . $this->_pregEscape($title) . '(\r?\n)+/', '', $abstract);
 
 		$link = $this->localRenderer->internallink($id, $content ?: $title, null, true);
 
@@ -134,13 +130,46 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 		}
 
 		if (page_exists($id)) {
-			// Remove the title attribute, since we have a better tooltip.
-			$link = preg_replace('/title="[^"]*"/', '', $link);
+			$abstract = $this->getAbstract($id, $title);
+			$link = $this->stripNativeTooltip($link);
 			return $this->forText($link, $abstract, $title, $preTitle, $classes);
 		}
 		else {
 			return $link;
 		}
+	}
+
+
+	/**
+	 * Get a formatted abstract.
+	 *
+	 * @param string $id
+	 * @param string $title
+	 * @return string
+	 */
+	function getAbstract($id, $title) {
+		// Check the "description" plugin.
+		$abstract = p_get_metadata($id, 'plugin_description keywords');
+		// Default doku abstract is the first part of the page.
+		if (empty($abstract)) {
+			$abstract = p_get_metadata($id, 'description abstract');
+		}
+
+
+		// By default, the abstract starts with the title. Remove it so it's not displayed twice, but still fetch
+		// both pieces of metadata, in case another plugin rewrote the abstract.
+		return preg_replace('/^' . $this->_pregEscape($title) . '(\r?\n)+/', '', $abstract);
+	}
+
+
+	/**
+	 * Strip the native title= tooltip from an anchor tag.
+	 *
+	 * @param string $link
+	 * @return string
+	 */
+	function stripNativeTooltip($link) {
+		return preg_replace('/title="[^"]*"/', '', $link);
 	}
 
 
