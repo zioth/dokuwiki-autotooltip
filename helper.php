@@ -9,6 +9,7 @@ if(!defined('DOKU_INC')) die();
  */
 class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 	private $localRenderer;
+	private static $metaCache = [];
 
 	public function __construct() {
 		$this->localRenderer = new Doku_Renderer_xhtml;
@@ -121,7 +122,11 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 	 * @return string
 	 */
 	function forWikilink($id, $content = null, $preTitle = '', $classes = '', $linkStyle = '') {
-		$title = p_get_metadata($id, 'title');
+		global $ID;
+		$id = resolve_id(getNS($ID), $id, false);
+
+		$meta = self::read_meta_fast($id);
+		$title = $meta['title'];
 
 		$link = $this->localRenderer->internallink($id, $content ?: $title, null, true);
 
@@ -129,36 +134,13 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 			$link = preg_replace('/<a /', '<a style="' . $linkStyle . '" ', $link);
 		}
 
-		if (page_exists($id)) {
-			$abstract = $this->getAbstract($id, $title);
+		if (page_exists(preg_replace('/\#.*$/', '', $id))) {
 			$link = $this->stripNativeTooltip($link);
-			return $this->forText($link, $abstract, $title, $preTitle, $classes);
+			return $this->forText($link, $meta['abstract'], $title, $preTitle, $classes);
 		}
 		else {
 			return $link;
 		}
-	}
-
-
-	/**
-	 * Get a formatted abstract.
-	 *
-	 * @param string $id
-	 * @param string $title
-	 * @return string
-	 */
-	function getAbstract($id, $title) {
-		// Check the "description" plugin.
-		$abstract = p_get_metadata($id, 'plugin_description keywords');
-		// Default doku abstract is the first part of the page.
-		if (empty($abstract)) {
-			$abstract = p_get_metadata($id, 'description abstract');
-		}
-
-
-		// By default, the abstract starts with the title. Remove it so it's not displayed twice, but still fetch
-		// both pieces of metadata, in case another plugin rewrote the abstract.
-		return preg_replace('/^' . $this->_pregEscape($title) . '(\r?\n)+/', '', $abstract);
 	}
 
 
@@ -170,6 +152,63 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 	 */
 	function stripNativeTooltip($link) {
 		return preg_replace('/title="[^"]*"/', '', $link);
+	}
+
+
+	/**
+	 * Reads specific metadata about 10x faster than p_get_metadata. p_get_metadata only uses caching for the current
+	 * page, and uses the very slow php serialization. However, in a wiki with infrequently accessed pages, it's
+	 * extremely slow.
+	 *
+	 * @param string $id
+	 * @return array - An array containing 'title' and 'abstract.'
+	 */
+	static function read_meta_fast($id) {
+		global $ID;
+		$id = resolve_id(getNS($ID), preg_replace('/\#.*$/', '', $id), true);
+
+		if (isset(self::$metaCache[$id])) {
+			return self::$metaCache[$id];
+		}
+
+		// These two lines are from metaFn. Doing it inline is much faster.
+		global $conf;
+		$mfile = $conf['metadir'].'/'.utf8_encodeFN(str_replace(':','/',$id)).'.meta';
+
+		$txt = file_get_contents($mfile);
+		$results = [];
+
+		// p_get_metadata(cleanID($id), 'title')
+		preg_match('/"title";s:\d+:"([^"]+)"/', $txt, $m);
+		if ($m) {
+			$results['title'] = $m[1];
+		}
+
+		// Description plugin
+		// p_get_metadata(cleanID($id), 'plugin_description keywords')
+		preg_match('/"plugin_description".+?"keywords";s:\d+:"([^"]+)"/', $txt, $m);
+		if ($m) {
+			$results['abstract'] = $m[1];
+		}
+		else {
+			// Default doku abstract is the first 200-500 characters of the page content.
+			// p_get_metadata(cleanID($id), 'description abstract')
+			preg_match('/"description".+?"abstract";s:\d+:"([^"]+)"/', $txt, $m);
+			if ($m) {
+				$results['abstract'] = $m[1];
+			}
+		}
+
+		// By default, the abstract starts with the title. Remove it so it's not displayed twice, but still fetch
+		// both pieces of metadata, in case another plugin rewrote the abstract.
+		$results['abstract'] = preg_replace(
+			'/^' . self::_pregEscape($results['title']) . '(\r?\n)+/',
+			'',
+			$results['abstract']
+		);
+
+		self::$metaCache[$id] = $results;
+		return $results;
 	}
 
 
@@ -193,7 +232,7 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 	 * @param string $r - The regex string, without delimiters.
 	 * @return string
 	 */
-	private function _pregEscape($r) {
+	private static function _pregEscape($r) {
 		return preg_replace('/\//', '\\/', preg_quote($r));
 	}
 }

@@ -49,12 +49,12 @@ class renderer_plugin_autotooltip extends Doku_Renderer_xhtml {
 	function internallink($id, $name = null, $search = null, $returnonly = false, $linktype = 'content') {
 		global $ID;
 		if (!$this->m_exclude && page_exists($id) && $id != $ID) {
-			$title = p_get_metadata($id, 'title');
-			$abstract = $this->m_helper->getAbstract($id, $title);
+			$meta = $this->m_helper->read_meta_fast($id);
+			$abstract = $meta['abstract'];
 
 			$link = parent::internallink($id, $name, $search, true, $linktype);
 			$link = $this->m_helper->stripNativeTooltip($link);
-			$link = $this->m_helper->forText($link, $abstract, $title);
+			$link = $this->m_helper->forText($link, $abstract, $meta['title']);
 
 			if (!$returnonly) {
 				$this->doc .= $link;
