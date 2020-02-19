@@ -32,7 +32,7 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 				'title (optional)' => 'string',
 				'preTitle (optional)' => 'string',
 				'classes (optional)' => 'string',
-				'textStyles (optional)' => 'string',
+				'textClasses (optional)' => 'string',
 			),
 			'return' => array('result' => 'string')
 		);
@@ -44,7 +44,7 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 				'content (optional)' => 'string',
 				'preTitle (optional)' => 'string',
 				'classes (optional)' => 'string',
-				'textStyles (optional)' => 'string',
+				'textClasses (optional)' => 'string',
 			),
 			'return' => array('result' => 'string')
 		);
@@ -60,10 +60,10 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 	 * @param string $title - The title inside the tooltip.
 	 * @param string $preTitle - Text to display before the title. Newlines will be rendered as line breaks.
 	 * @param string $classes - CSS classes to add to this tooltip.
-	 * @param string $textStyle - CSS styles for the linked content
+	 * @param string $textClasses - CSS classes to add to the linked text.
 	 * @return string
 	 */
-	function forText($content, $tooltip, $title='', $preTitle = '', $classes = '', $textStyle = '') {
+	function forText($content, $tooltip, $title='', $preTitle = '', $classes = '', $textClasses = '') {
 		if (empty($classes)) {
 			$classes = $this->getConf('style');
 		}
@@ -82,11 +82,10 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 			$classes .= ' plugin-autotooltip_big';
 		}
 
-		$textClass = '';
-		if (empty($textStyle)) {
-			$textClass = 'plugin-autotooltip_linked';
+		if (empty($textClasses)) {
+			$textClasses = 'plugin-autotooltip_linked';
 			if (strstr($content, '<a ') === FALSE) {
-				$textClass .= ' plugin-autotooltip_simple';
+				$textClasses .= ' plugin-autotooltip_simple';
 			}
 		}
 
@@ -101,7 +100,7 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 			$contentParts[] = $this->_formatTT($tooltip);
 		}
 
-		return '<span class="' . $textClass . '" style="' . $textStyle . '" onmouseover="autotooltip.show(this)" onmouseout="autotooltip.hide()" data-delay="' . $delay . '">' .
+		return '<span class="' . $textClasses . '" onmouseover="autotooltip.show(this)" onmouseout="autotooltip.hide()" data-delay="' . $delay . '">' .
 			$content .
 			'<span class="plugin-autotooltip-hidden-classes">' . $classes . '</span>' .
 			'<span class="plugin-autotooltip-hidden-tip">' .
@@ -118,10 +117,10 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 	 * @param string $content - The on-page content. Newlines will be rendered as line breaks. Omit to use the page's title.
 	 * @param string $preTitle - Text to display before the title in the tooltip. Newlines will be rendered as line breaks.
 	 * @param string $classes - CSS classes to add to this tooltip.
-	 * @param string $linkStyle - Style attribute for the link.
+	 * @param string $textClasses - CSS classes to add to the linked text.
 	 * @return string
 	 */
-	function forWikilink($id, $content = null, $preTitle = '', $classes = '', $linkStyle = '') {
+	function forWikilink($id, $content = null, $preTitle = '', $classes = '', $textClasses = '') {
 		global $ID;
 		$id = resolve_id(getNS($ID), $id, false);
 
@@ -130,13 +129,9 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 
 		$link = $this->localRenderer->internallink($id, $content ?: $title, null, true);
 
-		if (!empty($linkStyle)) {
-			$link = preg_replace('/<a /', '<a style="' . $linkStyle . '" ', $link);
-		}
-
 		if (page_exists(preg_replace('/\#.*$/', '', $id))) {
 			$link = $this->stripNativeTooltip($link);
-			return $this->forText($link, $meta['abstract'], $title, $preTitle, $classes);
+			return $this->forText($link, $meta['abstract'], $title, $preTitle, $classes, $textClasses);
 		}
 		else {
 			return $link;
@@ -171,33 +166,10 @@ class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
 			return self::$metaCache[$id];
 		}
 
-		// These two lines are from metaFn. Doing it inline is much faster.
-		global $conf;
-		$mfile = $conf['metadir'].'/'.utf8_encodeFN(str_replace(':','/',$id)).'.meta';
-
-		$txt = file_get_contents($mfile);
-		$results = [];
-
-		// p_get_metadata(cleanID($id), 'title')
-		preg_match('/"title";s:\d+:"([^"]+)"/', $txt, $m);
-		if ($m) {
-			$results['title'] = $m[1];
-		}
-
-		// Description plugin
-		// p_get_metadata(cleanID($id), 'plugin_description keywords')
-		preg_match('/"plugin_description".+?"keywords";s:\d+:"([^"]+)"/', $txt, $m);
-		if ($m) {
-			$results['abstract'] = $m[1];
-		}
-		else {
-			// Default doku abstract is the first 200-500 characters of the page content.
-			// p_get_metadata(cleanID($id), 'description abstract')
-			preg_match('/"description".+?"abstract";s:\d+:"([^"]+)"/', $txt, $m);
-			if ($m) {
-				$results['abstract'] = $m[1];
-			}
-		}
+		$results = [
+			'title' => p_get_metadata(cleanID($id), 'title'),
+			'abstract' => p_get_metadata(cleanID($id), 'plugin_description keywords') ?: p_get_metadata(cleanID($id), 'description abstract')
+		];
 
 		// By default, the abstract starts with the title. Remove it so it's not displayed twice, but still fetch
 		// both pieces of metadata, in case another plugin rewrote the abstract.
