@@ -13,6 +13,7 @@ class renderer_plugin_autotooltip extends Doku_Renderer_xhtml {
 	/** @type helper_plugin_autotooltip m_helper */
 	private $m_helper;
 	private $m_exclude;
+	private $m_points;
 
 	public function __construct() {
 		global $ID;
@@ -24,6 +25,13 @@ class renderer_plugin_autotooltip extends Doku_Renderer_xhtml {
 		$this->m_exclude =
 			(!empty($inclusions) && !preg_match("/$inclusions/", $ID)) ||
 			(!empty($exclusions) && preg_match("/$exclusions/", $ID));
+
+		// Set the regex for filtering link destinations
+		$points = $this->getConf('linkall_points_to');
+		if (empty($points)) {
+			$points = ".*";
+		}
+		$this->m_points = "/$points/";
 	}
 
 
@@ -48,7 +56,7 @@ class renderer_plugin_autotooltip extends Doku_Renderer_xhtml {
 	 */
 	function internallink($id, $name = null, $search = null, $returnonly = false, $linktype = 'content') {
 		global $ID;
-		if (!$this->m_exclude && page_exists($id) && $id != $ID) {
+		if (!$this->m_exclude && page_exists($id) && $id != $ID && preg_match($this->m_points,$id)) {
 			$meta = $this->m_helper->read_meta_fast($id);
 			$abstract = $meta['abstract'];
 
