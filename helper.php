@@ -7,7 +7,7 @@ if(!defined('DOKU_INC')) die();
  * @license    MIT
  * @author     Eli Fenton
  */
-class helper_plugin_autotooltip extends DokuWiki_Admin_Plugin {
+class helper_plugin_autotooltip extends DokuWiki_Plugin {
 	private $localRenderer;
 	private static $metaCache = [];
 
