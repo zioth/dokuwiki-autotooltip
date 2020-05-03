@@ -64,6 +64,6 @@ class renderer_plugin_autotooltip extends Doku_Renderer_xhtml {
 			}
 			return $link;
 		}
-		return parent::internallink($id, $name, $search, $returnonly, $linktype);
+		return parent::internallink($fullId, $name, $search, $returnonly, $linktype);
 	}
 }
