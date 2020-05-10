@@ -100,7 +100,7 @@ class helper_plugin_autotooltip extends DokuWiki_Plugin {
 			$contentParts[] = $this->_formatTT($tooltip);
 		}
 
-		return '<span class="' . $textClasses . '" onmouseover="autotooltip.show(this)" onmouseout="autotooltip.hide()" data-delay="' . $delay . '">' .
+		return '<span class="' . $textClasses . '" onmouseover="autotooltip.show(event)" onmouseout="autotooltip.hide()" data-delay="' . $delay . '">' .
 			$content .
 			'<span class="plugin-autotooltip-hidden-classes">' . $classes . '</span>' .
 			'<span class="plugin-autotooltip-hidden-tip">' .
