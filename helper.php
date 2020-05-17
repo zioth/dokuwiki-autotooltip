@@ -21,7 +21,7 @@ class helper_plugin_autotooltip extends DokuWiki_Plugin {
 	 *
 	 * @return array with methods description
 	 */
-	function getMethods() {
+	public function getMethods() {
 		$result = array();
 		$result[] = array(
 			'name' => 'forText',
@@ -63,7 +63,7 @@ class helper_plugin_autotooltip extends DokuWiki_Plugin {
 	 * @param string $textClasses - CSS classes to add to the linked text.
 	 * @return string
 	 */
-	function forText($content, $tooltip, $title='', $preTitle = '', $classes = '', $textClasses = '') {
+	public function forText($content, $tooltip, $title='', $preTitle = '', $classes = '', $textClasses = '') {
 		if (empty($classes)) {
 			$classes = $this->getConf('style');
 		}
@@ -120,7 +120,7 @@ class helper_plugin_autotooltip extends DokuWiki_Plugin {
 	 * @param string $textClasses - CSS classes to add to the linked text.
 	 * @return string
 	 */
-	function forWikilink($id, $content = null, $preTitle = '', $classes = '', $textClasses = '') {
+	public function forWikilink($id, $content = null, $preTitle = '', $classes = '', $textClasses = '') {
 		global $ID;
 		$id = resolve_id(getNS($ID), $id, false);
 
@@ -140,12 +140,26 @@ class helper_plugin_autotooltip extends DokuWiki_Plugin {
 
 
 	/**
+	 * Is this id excluded from the plugin?
+	 *
+	 * @param string $id
+	 * @return boolean
+	 */
+	public function isExcluded($id) {
+		$inclusions = $this->getConf('linkall_inclusions');
+		$exclusions = $this->getConf('linkall_exclusions');
+		return (!empty($inclusions) && !preg_match("/$inclusions/", $id)) ||
+			(!empty($exclusions) && preg_match("/$exclusions/", $id));
+	}
+
+
+	/**
 	 * Strip the native title= tooltip from an anchor tag.
 	 *
 	 * @param string $link
 	 * @return string
 	 */
-	function stripNativeTooltip($link) {
+	public function stripNativeTooltip($link) {
 		return preg_replace('/title="[^"]*"/', '', $link);
 	}
 
