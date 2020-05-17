@@ -52,7 +52,8 @@ class action_plugin_autotooltip extends DokuWiki_Action_Plugin {
 			if (!$this->m_helper->isExcluded($ID) && page_exists($id) && $id != $ID) {
 				$event->preventDefault();
 
-
+				// If we call $renderer->internallink directly here, it will cause infinite recursion,
+				// so we need this call_user_func_array hack.
 				$link = call_user_func_array(
 					array($renderer, 'parent::internallink'),
 					array($id, $name, $search, true, $linktype)
