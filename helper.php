@@ -103,9 +103,11 @@ class helper_plugin_autotooltip extends DokuWiki_Plugin {
 		return '<span class="' . $textClasses . '" onmouseover="autotooltip.show(event)" onmouseout="autotooltip.hide()" data-delay="' . $delay . '">' .
 			$content .
 			'<span class="plugin-autotooltip-hidden-classes">' . $classes . '</span>' .
+			"\n<!-- googleoff: all -->\n" .
 			'<span class="plugin-autotooltip-hidden-tip">' .
 			implode('<br><br>', $contentParts) .
 			'</span>' .
+			"\n<!-- googleon: all -->\n" .
 		'</span>';
 	}
 
