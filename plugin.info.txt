@@ -1,6 +1,6 @@
 author  Eli Fenton
 email
-date    2020-06-08
+date    2020-06-15
 name    Auto-Tooltip
 desc    Syntax and helper plugins for tooltips, including automatically generated tips based on page abstract.
 url     https://www.dokuwiki.org/plugin:autotooltip
