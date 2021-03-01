@@ -48,8 +48,10 @@ class action_plugin_autotooltip extends DokuWiki_Action_Plugin {
 			$returnonly = $args[3] ?: false;
 			$linktype = $args[4] ?: 'content';
 
+			resolve_pageid(getNS($ID), $id, $exists);
+
 			global $ID;
-			if (!$this->m_helper->isExcluded($ID) && page_exists($id) && $id != $ID) {
+			if (!$this->m_helper->isExcluded($ID) && $exists && $id != $ID) {
 				$event->preventDefault();
 
 				// If we call $renderer->internallink directly here, it will cause infinite recursion,
