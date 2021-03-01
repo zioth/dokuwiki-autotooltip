@@ -44,9 +44,10 @@ class renderer_plugin_autotooltip extends Doku_Renderer_xhtml {
 	function internallink($id, $name = null, $search = null, $returnonly = false, $linktype = 'content') {
 		global $ID;
 		$fullId = $id;
-		$id = preg_replace('/\#.*$/', '', $id);
+		$id = preg_replace('/(\#|\?).*$/', '', $id);
+		resolve_pageid(getNS($ID), $id, $exists, $this->date_at, true);
 
-		if (!$this->m_exclude && page_exists($id) && $id != $ID) {
+		if (!$this->m_exclude && $exists && $id != $ID) {
 			$link = parent::internallink($fullId, $name, $search, true, $linktype);
 
 			$meta = $this->m_helper->read_meta_fast($id);
