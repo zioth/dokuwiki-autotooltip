@@ -116,11 +116,11 @@ class syntax_plugin_autotooltip extends DokuWiki_Syntax_Plugin {
 			if ($data == 'ERROR') {
 				msg('Error: Invalid instantiation of autotooltip plugin');
 			}
-			else if ($data['pageid']) {
-				$renderer->doc .= $this->m_helper->forWikilink($data['pageid'], $data['content'], '', $data['classes']);
+			else if (isset($data['pageid'])) {
+				$renderer->doc .= $this->m_helper->forWikilink($data['pageid'], $data['content']??'', '', $data['classes']??'');
 			}
 			else {
-				$renderer->doc .= $this->m_helper->forText($data['content'], $data['tip'], $data['title'], '', $data['classes']);
+				$renderer->doc .= $this->m_helper->forText($data['content']??'', $data['tip']??'', $data['title']??'', '', $data['classes']??'');
 			}
 		}
 		else {
