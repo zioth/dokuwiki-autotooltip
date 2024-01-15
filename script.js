@@ -104,7 +104,9 @@ var autotooltip = function($) {
 			_move(evt);
 			clearInterval(m_timer);
 			m_timer = setTimeout(function() {
-				m_tt.addClass('plugin-autotooltip--visible');
+				if (m_visible) {
+					m_tt.addClass('plugin-autotooltip--visible');
+				}
 			}, parseInt($(elt).attr('data-delay')) || 50);
 		},
 
