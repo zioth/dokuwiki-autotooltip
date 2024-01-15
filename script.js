@@ -95,9 +95,10 @@ var autotooltip = function($) {
 			_init();
 
 			var elt = evt.currentTarget;
+			var extraClasses = $('.plugin-autotooltip-hidden-classes', elt).text();
 			m_tt
 				.html($('.plugin-autotooltip-hidden-tip', elt).html())
-				.attr('class', 'plugin-autotooltip_tip .plugin-autotooltip-hidden-classes');
+				.attr('class', 'plugin-autotooltip_tip ' + extraClasses);
 			// This isn't strictly needed because of the attachment to document.mousemove,
 			// but it forces proper initial placement when the mouse is moving rapidly (so
 			// move is throttled).
