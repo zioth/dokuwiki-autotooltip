@@ -1,5 +1,6 @@
 <?php
 if(!defined('DOKU_INC')) die();
+use dokuwiki\File\PageResolver;
 
 /**
  * Auto-Tooltip DokuWiki plugin
@@ -176,7 +177,10 @@ class helper_plugin_autotooltip extends DokuWiki_Plugin {
 	 */
 	static function read_meta_fast($id) {
 		global $ID;
-		$id = resolve_id(getNS($ID), preg_replace('/\#.*$/', '', $id), true);
+
+		$resolver = new PageResolver($ID);
+		$id = $resolver->resolveId(preg_replace('/\#.*$/', '', $id), null, true);
+
 
 		if (isset(self::$metaCache[$id])) {
 			return self::$metaCache[$id];
