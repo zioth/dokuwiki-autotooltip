@@ -1,6 +1,6 @@
 base    autotooltip
 author  Eli Fenton
-email
+email   undisclosed@undisclosed.undisclosed
 date    2024-02-04
 name    Auto-Tooltip
 desc    Syntax and helper plugins for tooltips, including automatically generated tips based on page abstract.
