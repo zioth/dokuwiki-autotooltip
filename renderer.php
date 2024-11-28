@@ -2,6 +2,7 @@
 if (!defined('DOKU_INC')) die();
 if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once DOKU_INC . 'inc/parser/xhtml.php';
+use dokuwiki\File\PageResolver;
 
 /**
  * Auto-Tooltip DokuWiki renderer plugin. If the current renderer is ActionRenderer, the action
@@ -44,7 +45,12 @@ class renderer_plugin_autotooltip extends Doku_Renderer_xhtml {
 	function internallink($id, $name = null, $search = null, $returnonly = false, $linktype = 'content') {
 		global $ID;
 		$fullId = $id;
+
+		$id = explode('?', $id, 2)[0];
 		$id = preg_replace('/\#.*$/', '', $id);
+		$id = preg_replace('/\?.*$/', '', $id);
+		$id = $id === '' ? $ID : $id;
+		$id = (new PageResolver($ID))->resolveId($id, $this->date_at, true);
 
 		if (!$this->m_exclude && page_exists($id) && $id != $ID) {
 			$link = parent::internallink($fullId, $name, $search, true, $linktype);
