@@ -1,7 +1,7 @@
 <?php
 if (!defined('DOKU_INC')) die();
 if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
-require_once DOKU_INC . 'inc/parser/xhtml.php';
+//require_once DOKU_INC . 'inc/parser/xhtml.php';
 
 /**
  * Auto-Tooltip DokuWiki plugin, for use with the ActionRenderer plugin. This will run only if

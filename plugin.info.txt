@@ -1,7 +1,7 @@
 base    autotooltip
 author  Eli Fenton
 email   undisclosed@undisclosed.undisclosed
-date    2024-11-28
+date    2025-07-20
 name    Auto-Tooltip
 desc    Syntax and helper plugins for tooltips, including automatically generated tips based on page abstract.
 url     https://www.dokuwiki.org/plugin:autotooltip

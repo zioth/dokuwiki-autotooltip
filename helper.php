@@ -125,7 +125,9 @@ class helper_plugin_autotooltip extends DokuWiki_Plugin {
 	 */
 	public function forWikilink($id, $content = null, $preTitle = '', $classes = '', $textClasses = '') {
 		global $ID;
-		$id = resolve_id(getNS($ID), $id, false);
+		//$id = resolve_id(getNS($ID), $id, false);
+		$resolver = new PageResolver($ID);
+                $id = $resolver->resolveId($id, null, true);
 
 		$meta = self::read_meta_fast($id);
 		$title = $meta['title'];
