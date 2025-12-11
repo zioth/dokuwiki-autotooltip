@@ -62,9 +62,11 @@ class helper_plugin_autotooltip extends DokuWiki_Plugin {
 	 * @param string $preTitle - Text to display before the title. Newlines will be rendered as line breaks.
 	 * @param string $classes - CSS classes to add to this tooltip.
 	 * @param string $textClasses - CSS classes to add to the linked text.
+	 * @param string $link - Link to this external URL. TODO: It would be better to parse arbitrary wikitext
+	 *    in $content, but that requires a refactor to use $renderer instead of generated HTML.
 	 * @return string
 	 */
-	public function forText($content, $tooltip, $title='', $preTitle = '', $classes = '', $textClasses = '') {
+	public function forText($content, $tooltip, $title='', $preTitle = '', $classes = '', $textClasses = '', $link = '') {
 		if (empty($classes)) {
 			$classes = $this->getConf('style');
 		}
@@ -99,6 +101,9 @@ class helper_plugin_autotooltip extends DokuWiki_Plugin {
 		}
 		if (!empty($tooltip)) {
 			$contentParts[] = $this->_formatTT($tooltip);
+		}
+		if (!empty($link)) {
+			$content = '<a href="'.$link.'">'.$content.'</a>';
 		}
 
 		return '<span class="' . $textClasses . '" onmouseover="autotooltip.show(event)" onmouseout="autotooltip.hide()" data-delay="' . $delay . '">' .

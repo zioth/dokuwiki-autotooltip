@@ -87,15 +87,18 @@ class syntax_plugin_autotooltip extends DokuWiki_Syntax_Plugin {
 			$content = [];
 			$tip = [];
 			$title = [];
+			$link = [];
 			preg_match('/<content>([\s\S]+)<\/content>/', $inner, $content);
 			preg_match('/<tip>([\s\S]+)<\/tip>/', $inner, $tip);
 			preg_match('/<title>([\s\S]+)<\/title>/', $inner, $title);
+			preg_match('/<link>([\s\S]+)<\/link>/', $inner, $link);
 
 			if (count($content) >= 1 || count($pageid) >= 1) {
-				$data['content'] = count($content) >= 1 ? $content[1] : '';
-				$data['tip'] = count($tip) >= 1 ? $tip[1] : null;
-				$data['title'] = count($title) >= 1 ? $title[1] : null;
-
+				$data['content'] = $content[1] ?? '';
+				$data['pageid'] = $pageid[1] ?? null;
+				$data['tip'] = $tip[1] ?? null;
+				$data['title'] = $title[1] ?? null;
+				$data['link'] = $link[1] ?? null;
 				return $data;
 			}
 		}
@@ -119,7 +122,15 @@ class syntax_plugin_autotooltip extends DokuWiki_Syntax_Plugin {
 				$renderer->doc .= $this->m_helper->forWikilink($data['pageid'], $data['content']??'', '', $data['classes']??'');
 			}
 			else {
-				$renderer->doc .= $this->m_helper->forText($data['content']??'', $data['tip']??'', $data['title']??'', '', $data['classes']??'');
+				$renderer->doc .= $this->m_helper->forText(
+					$data['content']??'',
+					$data['tip']??'',
+					$data['title']??'',
+					'', // preTitle
+					$data['classes']??'',
+					'', // textClasses
+					$data['link']??''
+				);
 			}
 		}
 		else {
