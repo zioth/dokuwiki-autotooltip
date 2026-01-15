@@ -38,8 +38,14 @@ class action_plugin_autotooltip extends DokuWiki_Action_Plugin {
 	 * @param array $param
 	 */
 	function actionrenderer(Doku_Event $event, $param) {
+		$renderer = $event->data['renderer'];
+
+		if (is_a($renderer, 'renderer_plugin_dw2pdf')) {
+			// dw2pdf should not render expanded tooltips.
+			return;
+		}
+
 		if ($event->data['method'] == 'internallink') {
-			$renderer = $event->data['renderer'];
 			$args = $event->data['arguments'];
 
 			$id = $args[0];

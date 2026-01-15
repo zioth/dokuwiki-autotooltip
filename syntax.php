@@ -114,7 +114,7 @@ class syntax_plugin_autotooltip extends DokuWiki_Syntax_Plugin {
 	 * @return bool|void
 	 */
 	function render($mode, Doku_Renderer $renderer, $data) {
-		if ($mode == 'xhtml') {
+		if ($mode == 'xhtml' && !is_a($renderer, 'renderer_plugin_dw2pdf')) {
 			if ($data == 'ERROR') {
 				msg('Error: Invalid instantiation of autotooltip plugin');
 			}
